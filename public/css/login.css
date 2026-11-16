@@ -1,0 +1,69 @@
+/* public/css/login.css
+   Page de connexion UniGest — à charger APRÈS app.css (utilise ses variables clair/sombre) */
+
+:root[data-theme="light"] { --danger: #B3261E; --danger-bg: #FDECEA; --ok: #1B6E4A; --ok-bg: #E6F4EC; }
+:root[data-theme="dark"]  { --danger: #FF9B94; --danger-bg: #3A1B1F; --ok: #8FDDB4;  --ok-bg: #0F3328; }
+
+.auth { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+/* ===== Panneau de gauche ===== */
+.auth-aside {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 32px;
+    padding: 44px 52px; color: var(--p-7);
+    background: linear-gradient(155deg, var(--p-2), var(--p-1));
+}
+.auth-aside .brand { color: #fff; }
+.auth-aside .brand-mark { background: rgba(189, 216, 233, .16); }
+.auth-aside h2 { color: #fff; font-size: 34px; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; max-width: 14em; }
+.auth-points { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
+.auth-points li { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+.auth-points svg { width: 22px; height: 22px; padding: 4px; border-radius: 50%; background: var(--p-6); color: var(--p-1); stroke-width: 2.6; }
+.auth-aside small { color: var(--p-5); }
+
+/* ===== Côté formulaire ===== */
+.auth-main { display: flex; flex-direction: column; padding: 22px 32px 40px; min-width: 0; }
+.auth-top { display: flex; align-items: center; gap: 14px; }
+.back-link { margin-left: auto; }
+.brand-mobile { display: none; }
+
+.auth-box { margin: auto; width: 100%; max-width: 400px; padding-top: 24px; }
+.auth-box h1 { font-size: 28px; font-weight: 800; letter-spacing: -.01em; }
+.auth-sub { color: var(--muted); margin-top: 4px; }
+
+.alert { margin-top: 20px; padding: 12px 14px; border-radius: 12px; font-weight: 500; }
+.alert-error { background: var(--danger-bg); color: var(--danger); }
+.alert-ok { background: var(--ok-bg); color: var(--ok); }
+
+.field { margin-top: 20px; }
+.field label { display: block; margin-bottom: 6px; font-weight: 600; }
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="text"] {
+    width: 100%; padding: 12px 14px; border-radius: 12px; font: inherit;
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    transition: border-color .15s, box-shadow .15s;
+}
+.field input:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-primary) 22%, transparent); }
+.field input.is-invalid { border-color: var(--danger); }
+
+.input-wrap { position: relative; }
+.input-wrap input { padding-right: 92px; }
+.toggle-pass {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--c-primary);
+}
+.toggle-pass:hover { background: var(--surface-2); }
+
+.auth-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--muted); }
+.check input { width: 16px; height: 16px; accent-color: var(--p-2); }
+
+.btn-login.block { width: 100%; margin-top: 24px; padding: 13px; border: 0; cursor: pointer; font-size: 15px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+    .auth { grid-template-columns: 1fr; }
+    .auth-aside { display: none; }
+    .brand-mobile { display: flex; }
+    .auth-main { padding: 18px 20px 32px; }
+}

@@ -1,0 +1,115 @@
+/* public/css/vitrine.css
+   Page d'accueil commune UniGest — à charger APRÈS unigest.css (utilise ses variables clair/sombre) */
+
+.v-wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+/* ===== En-tête ===== */
+.v-header {
+    position: sticky; top: 0; z-index: 30;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+}
+.v-header .v-wrap { display: flex; align-items: center; gap: 28px; height: 68px; }
+.v-nav { display: flex; gap: 6px; margin-left: 12px; }
+.v-nav a { padding: 8px 14px; border-radius: 10px; color: var(--muted); font-weight: 500; }
+.v-nav a:hover { background: var(--surface-2); color: var(--text); }
+.v-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+/* ===== Boutons ===== */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 11px 22px; border-radius: 12px; font-weight: 700; border: 1px solid transparent;
+    transition: transform .15s, background .15s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--c-primary); color: var(--on-primary); }
+.btn-ghost { border-color: var(--border); background: var(--surface); color: var(--text); }
+.btn-light { background: var(--p-6); color: var(--p-1); }
+
+/* ===== Hero ===== */
+.v-hero { padding: 76px 0 64px; }
+.v-hero .v-wrap { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; }
+.v-hero h1 {
+    font-size: clamp(34px, 5vw, 54px); font-weight: 800; line-height: 1.08; letter-spacing: -.02em;
+}
+.v-hero p { margin-top: 18px; max-width: 52ch; color: var(--muted); font-size: 17px; line-height: 1.6; }
+.v-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.v-figures { display: flex; gap: 34px; margin-top: 40px; }
+.v-figures b { display: block; font-size: 28px; font-weight: 800; color: var(--c-primary); line-height: 1.1; }
+.v-figures span { color: var(--muted); font-size: 13px; }
+
+/* Aperçu du produit */
+.v-preview {
+    border-radius: 24px; padding: 28px; display: flex; flex-direction: column; gap: 14px;
+    background: linear-gradient(150deg, var(--p-2), var(--p-1)); color: var(--p-7);
+    box-shadow: var(--shadow);
+}
+.v-mini {
+    display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px;
+    background: rgba(189, 216, 233, .1); border: 1px solid rgba(189, 216, 233, .16);
+}
+.v-mini:nth-child(2) { margin-left: 28px; }
+.v-mini:nth-child(3) { margin-right: 28px; }
+.v-mini .tile {
+    width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--p-6); color: var(--p-1); flex-shrink: 0;
+}
+.v-mini b { display: block; color: #fff; }
+.v-mini small { color: var(--p-7); }
+.v-mini .val { margin-left: auto; font-weight: 800; color: #fff; font-size: 18px; white-space: nowrap; }
+
+/* ===== Sections ===== */
+.v-section { padding: 64px 0; }
+.v-section.alt { background: var(--surface-2); border-block: 1px solid var(--border); }
+.v-title { max-width: 620px; margin-bottom: 34px; }
+.v-title h2 { font-size: 30px; font-weight: 800; letter-spacing: -.01em; }
+.v-title p { margin-top: 8px; color: var(--muted); font-size: 16px; }
+
+.v-grid { display: grid; gap: 20px; }
+.v-grid.four { grid-template-columns: repeat(4, 1fr); }
+.v-grid.three { grid-template-columns: repeat(3, 1fr); }
+
+.v-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+}
+.v-card .tile {
+    width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center;
+    background: var(--active-bg); color: var(--active-text); margin-bottom: 16px;
+}
+.v-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.v-card p { color: var(--muted); }
+
+.v-flat { display: flex; gap: 16px; align-items: flex-start; }
+.v-flat .tile {
+    width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--surface); border: 1px solid var(--border); color: var(--c-primary); flex-shrink: 0;
+}
+.v-flat h3 { font-size: 16px; font-weight: 700; }
+.v-flat p { color: var(--muted); margin-top: 2px; }
+
+/* ===== Bandeau final ===== */
+.v-band {
+    border-radius: 24px; padding: 48px 32px; text-align: center;
+    background: linear-gradient(135deg, var(--p-2), var(--p-1)); color: var(--p-7);
+}
+.v-band h2 { color: #fff; font-size: 28px; font-weight: 800; }
+.v-band p { margin: 8px auto 24px; max-width: 48ch; }
+
+/* ===== Pied de page ===== */
+.v-footer { padding: 32px 0 40px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 64px; }
+.v-footer .v-wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 960px) {
+    .v-hero .v-wrap { grid-template-columns: 1fr; }
+    .v-grid.four { grid-template-columns: repeat(2, 1fr); }
+    .v-grid.three { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+    .v-nav { display: none; }
+    .v-hero { padding-top: 44px; }
+    .v-grid.four, .v-grid.three { grid-template-columns: 1fr; }
+    .v-figures { gap: 22px; }
+    .v-mini:nth-child(2), .v-mini:nth-child(3) { margin: 0; }
+}

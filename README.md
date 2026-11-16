@@ -1,3 +1,3 @@
 # Uni Gest
 
-Gestion de Departement
+Gestion de Departement et Facultative

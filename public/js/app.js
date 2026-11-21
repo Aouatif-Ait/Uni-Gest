@@ -164,4 +164,258 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+     /* 7. GESTION DES NOTES
+       Sélection dynamique Filière → Semestre → Module */
+       
+    const filiere = document.getElementById('filiere');
+    const semestre = document.getElementById('semestre');
+    const module = document.getElementById('module');
+
+    // Vérifier que les éléments existent sur la page
+    if (!filiere || !semestre || !module) {
+        return;
+    }
+    // URLs des routes Laravel
+    const urlSemestres = '/enseignant/semestres/';
+    const urlModules = '/enseignant/modules/';
+
+    // Changement de filière
+    filiere.addEventListener('change', function () {
+        semestre.innerHTML =
+            '<option value="">Choisir un semestre</option>';
+        module.innerHTML = '<option value="">Choisir un module</option>';
+        semestre.disabled = true;
+        module.disabled = true;
+        const idFiliere = this.value;
+        if (!idFiliere) return;
+        fetch(urlSemestres + idFiliere)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur de chargement des semestres');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.IDSEMESTRE;
+                    option.textContent = item.libelle;
+                    semestre.appendChild(option);
+                });
+                semestre.disabled = data.length === 0;
+            })
+            .catch(error => console.error(error));
+    });
+
+    // Changement de semestre
+    semestre.addEventListener('change', function () {
+        module.innerHTML = '<option value="">Choisir un module</option>';
+        module.disabled = true;
+        const idSemestre = this.value;
+        if (!idSemestre) return;
+        fetch(urlModules + idSemestre)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur de chargement des modules');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.IDMODULE;
+                    option.textContent = item.intitule;
+
+                    module.appendChild(option);
+                });
+                module.disabled = data.length === 0;
+            })
+            .catch(error => console.error(error));
+    });
+
+    // 8. GESTION DES NOTES PAR AJAX 
+    const formNotes = document.getElementById('formNotes');
+    if (formNotes) {
+        const table = document.getElementById('tableEtudiants');        
+        const infoExamen = document.getElementById('infoExamen');
+        const message = document.getElementById('messageNotes');
+        const idExamenInput = document.getElementById('idExamen');
+        const btnAfficher = document.getElementById('btnAfficher');
+        const btnEnregistrer = document.getElementById('btnEnregistrerNotes');
+
+        if (!btnAfficher || !btnEnregistrer) {
+            console.error('Bouton introuvable :', {
+                btnAfficher,
+                btnEnregistrer
+            });
+            return;
+        }
+
+        // AFFICHER LES ETUDIANTS
+        formNotes.addEventListener('submit', function (e) {
+            e.preventDefault();
+            btnAfficher.disabled = true;
+            btnAfficher.textContent = 'Chargement...';
+            btnEnregistrer.disabled = true;
+            message.textContent = '';
+            fetch(formNotes.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new FormData(formNotes)
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Erreur de chargement.');
+                }
+                return data;
+            })
+            .then(data => {
+                table.innerHTML = '';
+                idExamenInput.value = data.examen.IDEXAMEN;
+                infoExamen.textContent =
+                    'Examen N° : ' + data.examen.IDEXAMEN;
+                if (data.etudiants.length === 0) {
+                    table.innerHTML = `<tr>
+                                            <td colspan="5" class="text-center">
+                                                Aucun étudiant trouvé.
+                                            </td>
+                                        </tr>`;
+                    return;
+                }
+                data.etudiants.forEach(etudiant => {
+                    const tr = document.createElement('tr');
+
+                    const tdNumero = document.createElement('td');
+                    tdNumero.textContent = etudiant.IDETUD;
+
+                    const tdNom = document.createElement('td');
+                    tdNom.textContent = etudiant.nom;
+
+                    const tdPrenom = document.createElement('td');
+                    tdPrenom.textContent = etudiant.prenom;
+
+                    const tdCne = document.createElement('td');
+                    tdCne.textContent = etudiant.cne;
+
+                    const tdNote = document.createElement('td');
+
+                    const inputNote = document.createElement('input');
+                    inputNote.type = 'number';
+                    inputNote.className = 'form-control';
+                    inputNote.min = '0';
+                    inputNote.max = '20';
+                    inputNote.step = '0.25';
+
+                    inputNote.name = `notes[${etudiant.IDETUD}]`;
+
+                    inputNote.value = etudiant.valeur !== null
+                        ? etudiant.valeur
+                        : '';
+
+                    inputNote.placeholder = 'Note /20';
+
+                    tdNote.appendChild(inputNote);
+
+                    tr.append(
+                        tdNumero,
+                        tdNom,
+                        tdPrenom,
+                        tdCne,
+                        tdNote
+                    );
+
+                    table.appendChild(tr);
+                });
+                btnEnregistrer.disabled = false;
+                message.textContent =
+                    'Vous pouvez maintenant saisir ou modifier les notes.';
+            })
+            .catch(error => {
+                console.error(error);
+                message.textContent = error.message;
+            })
+            .finally(() => {
+                btnAfficher.disabled = false;
+                btnAfficher.textContent = 'Afficher les étudiants';
+            });
+        });
+
+        // ENREGISTRER LES NOTES
+        btnEnregistrer.addEventListener('click', function () {
+            const inputs = table.querySelectorAll(
+                'input[name^="notes["]'
+            );
+            let auMoinsUneNote = false;
+            let notesValides = true;
+            inputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    auMoinsUneNote = true;
+                }
+                if (
+                    input.value.trim() !== '' &&
+                    (
+                        Number(input.value) < 0 ||
+                        Number(input.value) > 20
+                    )
+                ) {
+                    input.setCustomValidity(
+                        'La note doit être comprise entre 0 et 20.'
+                    );
+                    notesValides = false;
+                } else {
+                    input.setCustomValidity('');
+                }
+            });
+            if (!auMoinsUneNote) {
+                message.textContent =
+                    'Veuillez saisir au moins une note.';
+                return;
+            }
+            if (!notesValides) {
+                table.querySelector('input:invalid')?.reportValidity();
+                return;
+            }
+            btnEnregistrer.disabled = true;
+            btnEnregistrer.textContent = 'Enregistrement...';
+
+            message.textContent = '';
+            fetch(formNotes.dataset.saveUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new FormData(formNotes)
+            })
+            .then(async response => {
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || 'Erreur lors de l’enregistrement.'
+                    );
+                }
+
+                return data;
+            })
+            .then(data => {
+                message.textContent = data.message;
+                message.style.color = 'green';
+            })
+            .catch(error => {
+                console.error(error);
+                message.textContent = error.message;
+                message.style.color = 'red';
+            })
+            .finally(() => {
+                btnEnregistrer.disabled = false;
+                btnEnregistrer.textContent = 'Enregistrer les notes';
+            });
+        });
+    }
+
 });

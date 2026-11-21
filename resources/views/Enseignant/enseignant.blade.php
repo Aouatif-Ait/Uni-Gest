@@ -152,84 +152,116 @@
         </div>
     </div>
 
-        {{-- Accès rapides --}}
-    <div class="card">
-        <div class="card-head">
-            <h2>Accès rapides</h2>
-        </div>
-
-        <ul class="list">
-
-            {{-- Modules --}}
-            <li>
-                <span class="tile">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4 4h16v16H4z"/>
-                    </svg>
-                </span>
-                <div class="txt">
-                    <b>
-                        <a href="{{ route('Enseignant.modules') }}">
-                            Mes modules
-                        </a>
-                    </b>
-                    <small>Consulter mes modules</small>
-                </div>
-            </li>
-
-            {{-- Notes --}}
-            <li>
-                <span class="tile">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M5 3h14v18H5z"/>
-                    </svg>
-                </span>
-                <div class="txt">
-                    <b>
-                        <a href="{{ route('Enseignant.FilieresmodulesNotes') }}">
-                            Gestion des notes
-                        </a>
-                    </b>
-                    <small>Saisir et modifier les notes</small>
-                </div>
-            </li>
-
-            {{-- Etudiants --}}
-            <li>
-                <span class="tile">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/>
-                    </svg>
-                </span>
-                <div class="txt">
-                    <b>
-                        <a href="{{ route('Enseignant.Filieresmodules') }}">
-                            Mes étudiants
-                        </a>
-                    </b>
-                    <small>Consulter les étudiants</small>
-                </div>
-            </li>
-
-            {{-- Supports de cours --}}
-            <li>
-                <span class="tile">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4 4h16v16H4z"/>
-                    </svg>
-                </span>
-                <div class="txt">
-                    <b>
-                        <a href="{{ url('/enseignant/cours') }}">
-                            Supports de cours
-                        </a>
-                    </b>
-                    <small>Déposer des documents</small>
-                </div>
-            </li>
-        </ul>
+      
+{{-- Accès rapides --}}
+<div class="card">
+    <div class="card-head">
+        <h2>Accès rapides</h2>
     </div>
+
+    <ul class="list">
+
+        {{-- Modules --}}
+        <li>
+            <span class="tile">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M12 7v14"/>
+                    <path d="M3 18V5a2 2 0 0 1 2-2h4a3 3 0 0 1 3 3 3 3 0 0 1 3-3h4a2 2 0 0 1 2 2v13"/>
+                    <path d="M3 18a2 2 0 0 1 2-2h4a3 3 0 0 1 3 3 3 3 0 0 1 3-3h4a2 2 0 0 1 2 2"/>
+                </svg>
+            </span>
+            <div class="txt">
+                <b>
+                    <a href="{{ route('Enseignant.modules') }}">
+                        Mes modules
+                    </a>
+                </b>
+                <small>Consulter mes modules</small>
+            </div>
+        </li>
+
+        {{-- Notes --}}
+        <li>
+            <span class="tile">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M8 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3"/>
+                    <path d="M8 2h8v4H8z"/>
+                    <path d="m8 13 2 2 5-5"/>
+                    <path d="M8 18h8"/>
+                </svg>
+            </span>
+            <div class="txt">
+                <b>
+                    <a href="{{ route('Enseignant.gestionNotes') }}">
+                        Gestion des notes
+                    </a>
+                </b>
+                <small>Saisir et modifier les notes</small>
+            </div>
+        </li>
+
+        {{-- Etudiants --}}
+        <li>
+            <span class="tile">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </span>
+            <div class="txt">
+                <b>
+                    <a href="{{ route('Enseignant.Filieresmodules') }}">
+                        Mes étudiants
+                    </a>
+                </b>
+                <small>Consulter les étudiants</small>
+            </div>
+        </li>
+
+        {{-- Supports de cours --}}
+        <li>
+            <span class="tile">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+                    <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <path d="M3 10h18"/>
+                </svg>
+            </span>
+            <div class="txt">
+                <b>
+                    <a href="{{ url('/enseignant/cours') }}">
+                        Supports de cours
+                    </a>
+                </b>
+                <small>Déposer des documents</small>
+            </div>
+        </li>
+
+    </ul>
+</div>
 </section>
+
 
     {{-- Mes étudiants --}}
 <div class="card span-2">

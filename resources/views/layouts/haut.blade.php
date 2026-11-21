@@ -1,18 +1,29 @@
 {{-- resources/views/layouts/haut.blade.php : <head>, barre latérale, barre du haut --}}
 @php
-    // Menu latéral : [libellé, lien, icône SVG]
+    $role = auth()->user()->role ?? null;
+
     $menu = [
-        ['Tableau de bord', '/',             'M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V11z'],
-        ['Étudiants',       '/etudiants',    'M12 3l10 5-10 5L2 8l10-5zm-6 9v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4'],
-        ['Enseignants',     '/enseignants',  'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0'],
-        ['Filières',        '/filieres',     'M4 5h16M4 12h16M4 19h16'],
-        ['Modules & cours', '/modules',      'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z'],
-        ['Examens',         '/examens',      'M7 3h10v4H7zM5 7h14v14H5z'],
-        ['Notes',           '/notes',        'M4 20V10m6 10V4m6 16v-7m4 7H2'],
-        ['PFE',             '/pfe',          'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],
-        ['Annonces',        '/annonces',     'M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1zm14-2a4 4 0 0 1 0 6'],
-        ['Réclamations',    '/reclamations', 'M12 9v4m0 4h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'],
-        ['Sécurité',        '/securite',     'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z'],
+        ['Tableau de bord', '/', 'M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V11z'],
+        ['Étudiants', '/etudiants', 'M12 3l10 5-10 5L2 8l10-5zm-6 9v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4'],
+        ['Enseignants', '/enseignants', 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0'],
+        ['Filières', '/filieres', 'M4 5h16M4 12h16M4 19h16'],
+        ['Modules & cours', '/modules', 'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z'],
+        ['Examens', '/examens', 'M7 3h10v4H7zM5 7h14v14H5z'],
+
+        [
+            'Notes',
+            match ($role) {
+                'Enseignant' => 'enseignant/moyennes',
+                'Etudiant' => 'etudiant/notes',
+                default => 'notes',
+            },
+            'M4 20V10m6 10V4m6 16v-7m4 7H2'
+        ],
+
+        ['PFE', '/pfe', 'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],
+        ['Annonces', '/annonces', 'M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1zm14-2a4 4 0 0 1 0 6'],
+        ['Réclamations', '/reclamations', 'M12 9v4m0 4h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'],
+        ['Sécurité', '/securite', 'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z'],
     ];
 @endphp
 <!DOCTYPE html>
@@ -48,9 +59,12 @@
         <nav class="nav">
             @foreach ($menu as [$label, $href, $icon])
                 <a href="{{ url($href) }}"
-                   class="{{ request()->is(ltrim($href, '/')) ? 'active' : '' }}"
-                   @if ($loop->first) aria-current="page" @endif>
-                    <svg viewBox="0 0 24 24"><path d="{{ $icon }}"/></svg>
+                class="{{ request()->is(trim($href, '/')) ? 'active' : '' }}">
+
+                    <svg viewBox="0 0 24 24">
+                        <path d="{{ $icon }}"/>
+                    </svg>
+
                     {{ $label }}
                 </a>
             @endforeach

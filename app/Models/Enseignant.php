@@ -51,5 +51,13 @@ class Enseignant extends Model{
             'IDENSG'
         );
     }
+
+    public function note(): HasMany{
+        return $this->hasMany(
+            Note::class,
+            'IDNOTE',
+            'IDNOTE'
+        );
+    }
 }
 

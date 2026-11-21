@@ -122,13 +122,45 @@ Route::middleware('auth')->group(function () {
         EnseignantController::class,
         'mesetudiantsModule'
     ])->name('Enseignant.Modulesetudiants');
-
+    
     //Les modules de chaque filière
     Route::get('/enseignant/notes', [
         EnseignantController::class,
-        'gestionDesNotes'
-    ])->name('Enseignant.FilieresmodulesNotes');
+        'getFilieres'
+    ])->name('Enseignant.gestionNotes');
+
+    Route::get(
+    '/enseignant/semestres/{idFiliere}',[
+        EnseignantController::class, 
+        'getSemestres'
+    ])->name('Enseignant.semestres');
+
+    Route::get('/enseignant/modules/{idSemestre}', [
+        EnseignantController::class,
+        'getModules'
+    ])->name('Enseignant.getModules');
+
+    Route::post('/enseignant/notes/etudiants', [
+        EnseignantController::class,
+    'afficherEtudiants'
+    ])->name('Enseignant.afficherEtudiants');
+
+    Route::post('/enseignant/notes/enregistrer', [
+        EnseignantController::class,
+    'enregistrerNotes'
+    ])->name('Enseignant.enregistrerNotes');
+
+    Route::get('/enseignant/moyennes', [
+        EnseignantController::class,
+        'moyennes'
+    ])->name('Enseignant.moyennes');
+
+    Route::post('/enseignant/moyennes/rechercher', [
+        EnseignantController::class,
+        'rechercherMoyennes'
+    ])->name('Enseignant.rechercherMoyennes');
 });
+
 /*use Illuminate\Http\Request;
 
 Route::get('/logout', function (Request $request) {

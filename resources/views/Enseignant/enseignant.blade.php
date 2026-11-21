@@ -20,16 +20,17 @@
         [
             'label' => 'Mes cours',
             'value' => $stats['cours'] ?? 0,
-            'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5'
+            'icon' => 'M2 3h8a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z M22 3h-8a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h9z'
+
         ],
         [
             'label' => 'Mes sujets PFE',
             'value' => $stats['pfe'] ?? 0,
-            'icon' => 'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'
+            'icon' => 'M2 10l10-7 10 7 M5 9v5c0 4 14 4 14 0V9 M5 14v4c4 3 10 3 14 0v-4 M12 3v7'
         ],
         [
             'label' => 'Documents déposés',
-            'value' => $stats['documents'] ?? 0,
+            'value' => $stats['documents'] ?? 0,  
             'icon' => 'M6 2h8l5 5v15H6z M14 2v6h5 M9 13h7 M9 17h7'
         ],
     ] as $stat)

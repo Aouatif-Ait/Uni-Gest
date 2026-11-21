@@ -9,24 +9,50 @@
     ];
 
     $profils = [
-        ['Étudiant',        'Consulter ses notes, ses convocations et ses cours, candidater aux sujets de PFE et envoyer une réclamation.',
-            'M12 3l10 5-10 5L2 8l10-5zm-6 9v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4'],
-        ['Enseignant',      'Gérer ses cours, TD et TP, saisir les notes, surveiller les examens et encadrer des projets de fin d\'études.',
-            'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0'],
-        ['Responsable PFE', 'Proposer des sujets, suivre les candidatures et contrôler l\'affectation des encadrants.',
-            'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],
-        ['Administrateur',  'Administrer les comptes, les filières, les modules, les examens et les annonces du département.',
-            'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z'],
+    ['Étudiant',
+     'Consulter ses notes, ses convocations et ses cours, candidater aux sujets de PFE et envoyer une réclamation.',
+     'M4 19.5A2.5 2.5 0 0 1 6.5 17H20 M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'],
+
+    ['Enseignant',
+     'Gérer ses cours, TD et TP, saisir les notes, surveiller les examens et encadrer des projets de fin d\'études.',
+     'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'],
+
+    ['Responsable PFE',
+     'Proposer des sujets, suivre les candidatures et contrôler l\'affectation des encadrants.',
+     'M9 12l2 2 4-4 M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'],
+
+    ['Administrateur',
+     'Administrer les comptes, les filières, les modules, les examens et les annonces du département.',
+     'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'],
     ];
 
+    
     $modules = [
-        ['Comptes et sécurité',      'Accès par profil et protection des données.',        'M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z'],
-        ['Parcours académique',      'Cycles, filières, semestres et inscriptions.',        'M4 5h16M4 12h16M4 19h16'],
-        ['Cours et modules',         'Affectations, cours, TD, TP et salles.',              'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z'],
-        ['Examens et notes',         'Sessions, convocations, surveillance et résultats.',  'M7 3h10v4H7zM5 7h14v14H5z'],
-        ['Projets de fin d\'études', 'Sujets, candidatures et affectation des encadrants.', 'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],
-        ['Annonces et réclamations', 'Communication entre l\'administration et les étudiants.', 'M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1zm14-2a4 4 0 0 1 0 6'],
+        ['Comptes et sécurité',
+        'Accès par profil et protection des données.',
+        'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'],
+
+        ['Parcours académique',
+        'Cycles, filières, semestres et inscriptions.',
+        'M3 3h18v18H3z M3 9h18 M9 21V9'],
+
+        ['Cours et modules',
+        'Affectations, cours, TD, TP et salles.',
+        'M4 19.5A2.5 2.5 0 0 1 6.5 17H20 M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'],
+
+        ['Examens et notes',
+        'Sessions, convocations, surveillance et résultats.',
+        'M8 2h8v4H8z M6 4H4v18h16V4h-2 M8 13l2 2 5-5'],
+
+        ['Projets de fin d\'études',
+        'Sujets, candidatures et affectation des encadrants.',
+        'M12 3v18 M3 12h18 M5.6 5.6l12.8 12.8 M18.4 5.6L5.6 18.4'],
+
+        ['Annonces et réclamations',
+        'Communication entre l\'administration et les étudiants.',
+        'M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1z M17 9a4 4 0 0 1 0 6'],
     ];
+
 @endphp
 <!DOCTYPE html>
 <html lang="fr" data-theme="light">
@@ -109,21 +135,57 @@
                     <div><b>{{ number_format($stats['filieres'], 0, ',', ' ') }}</b><span>Filières</span></div>
                 </div>
             </div>
-
+            
             <div class="v-preview" aria-hidden="true">
+                {{-- Bases de données --}}
                 <div class="v-mini">
-                    <span class="tile"><svg viewBox="0 0 24 24"><path d="M7 3h10v4H7zM5 7h14v14H5z"/></svg></span>
-                    <div><b>Bases de données</b><small>Amphi A · 12 Nov, 09:00</small></div>
+                    <span class="tile">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                            <path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/>
+                            <path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <b>Bases de données</b>
+                        <small>Amphi A · 12 Nov, 09:00</small>
+                    </div>
                     <span class="val">Convoqué</span>
                 </div>
+                {{-- Moyenne du semestre --}}
                 <div class="v-mini">
-                    <span class="tile"><svg viewBox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m4 7H2"/></svg></span>
-                    <div><b>Moyenne du semestre</b><small>Licence IA</small></div>
+                    <span class="tile">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/>
+                            <path d="M7 14l4-4 4 3 6-7"/>
+                            <path d="M17 6h4v4"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <b>Moyenne du semestre</b>
+                        <small>Licence IA</small>
+                    </div>
                     <span class="val">16,90 / 20</span>
                 </div>
+                {{-- Candidature PFE --}}
                 <div class="v-mini">
-                    <span class="tile"><svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></span>
-                    <div><b>Candidature PFE</b><small>Sujet validé par l'encadrant</small></div>
+                    <span class="tile">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2h9l5 5v15H6z"/>
+                            <path d="M15 2v6h5"/>
+                            <path d="m9 15 2 2 5-5"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <b>Candidature PFE</b>
+                        <small>Sujet validé par l'encadrant</small>
+                    </div>
                     <span class="val">Acceptée</span>
                 </div>
             </div>

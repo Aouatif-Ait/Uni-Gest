@@ -8,9 +8,14 @@
 
         <div class="register-header">
             <div class="register-icon">
-                <i class="bi bi-person-plus"></i>
+                <svg viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="10" cy="7" r="4"/>
+                    <path d="M19 8v6m-3-3h6"/>
+                </svg>
             </div>
-            
             <h2>Créer un compte Enseignant</h2>
 
             <p>
@@ -35,7 +40,12 @@
 
             {{-- Informations personnelles --}}
             <h5 class="register-section-title">
-                <i class="bi bi-person"></i>
+                <svg viewBox="0 0 24 24" width="20" height="20"
+                    fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M5 21v-2a7 7 0 0 1 14 0v2"/>
+                </svg>
                 Informations personnelles
             </h5>
 
@@ -75,7 +85,12 @@
 
             {{-- Informations professionnelles --}}
             <h5 class="register-section-title">
-                <i class="bi bi-mortarboard"></i>
+                <svg viewBox="0 0 24 24" width="20" height="20"
+                    fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 10l10-7 10 7"/>
+                    <path d="M4 10v8m5-8v8m6-8v8m5-8v8M2 21h20"/>
+                </svg>
                 Informations professionnelles
             </h5>
 
@@ -105,7 +120,12 @@
 
             {{-- Sécurité --}}
             <h5 class="register-section-title">
-                <i class="bi bi-shield-lock"></i>
+                <svg viewBox="0 0 24 24" width="20" height="20"
+                    fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="m9 12 2 2 4-4"/>
+                </svg>
                 Sécurité du compte
             </h5>
 
@@ -136,7 +156,13 @@
             </div>
 
             <button type="submit" class="register-submit">
-                <i class="bi bi-person-check"></i>
+                <svg viewBox="0 0 24 24" width="20" height="20"
+                    fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="10" cy="7" r="4"/>
+                    <path d="m19 8 0 6m-3-3h6"/>
+                </svg>
                 Créer mon compte
             </button>
 

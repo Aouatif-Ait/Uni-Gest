@@ -53,24 +53,52 @@
                 <p>Suivez l'activité du département : étudiants, examens, notes et PFE.</p>
             </section>
 
-            {{-- Statistiques --}}
+           
+           {{-- Statistiques --}}
             <section class="grid stats" aria-label="Chiffres clés">
+
                 @foreach ([
-                    ['Étudiants',     $stats['etudiants'],   'M12 3l10 5-10 5L2 8l10-5zm-6 9v4c0 1.5 2.7 3 6 3s6-1.5 6-3v-4'],
-                    ['Enseignants',   $stats['enseignants'], 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0'],
-                    ['Filières',      $stats['filieres'],    'M4 5h16M4 12h16M4 19h16'],
-                    ['Sujets de PFE', $stats['pfe'],         'M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z'],
+                    [
+                        'Étudiants',
+                        $stats['etudiants'],
+                        'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21v-2a8 8 0 0 1 16 0v2 M19 8a3 3 0 0 1 0 6 M21 21v-2a6 6 0 0 0-2-4.5'
+                    ],
+                    [
+                        'Enseignants',
+                        $stats['enseignants'],
+                        'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M2 21v-2a8 8 0 0 1 16 0v2 M19 8a3 3 0 0 1 0 6'
+                    ],
+                    [
+                        'Filières',
+                        $stats['filieres'],
+                        'M4 5h16 M4 12h16 M4 19h16 M8 3v4 M16 10v4 M8 17v4'
+                    ],
+                    [
+                        'Sujets de PFE',
+                        $stats['pfe'],
+                        'M6 2h9l5 5v15H6z M15 2v5h5 M9 13h7 M9 17h7'
+                    ],
                 ] as [$label, $value, $icon])
                     <article class="stat">
                         <div>
                             <span>{{ $label }}</span>
                             <strong>{{ number_format($value, 0, ',', ' ') }}</strong>
                         </div>
-                        <span class="ico"><svg viewBox="0 0 24 24"><path d="{{ $icon }}"/></svg></span>
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="{{ $icon }}"/>
+                            </svg>
+                        </span>
                     </article>
-                @endforeach
-            </section>
 
+                @endforeach
+
+            </section>
             <section class="grid cols">
 
                 {{-- Prochains examens --}}
@@ -168,7 +196,17 @@
                     <ul class="list">
                         @foreach ($annonces as $a)
                             <li>
-                                <span class="tile"><svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1zm14-2a4 4 0 0 1 0 6"/></svg></span>
+                                <span class="tile">
+                                    <svg viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.8"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M4 4h16v16H4z"/>
+                                        <path d="M8 9h8 M8 13h8 M8 17h5"/>
+                                    </svg>
+                                </span>
                                 <div class="txt"><b>{{ $a['titre'] }}</b><small>{{ $a['auteur'] }}</small></div>
                                 <time>{{ $a['date'] }}</time>
                             </li>

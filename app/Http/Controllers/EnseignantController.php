@@ -201,40 +201,40 @@ class EnseignantController extends Controller{
         return view('Enseignant.Filieresmodules', compact('filieres'));
     }
     
-public function mesetudiantsModule(int $id, int $annee){
-    // Récupérer l'enseignant connecté
-    $enseignant = $this->recupererenseignant();
+    public function mesetudiantsModule(int $id, int $annee){
+        // Récupérer l'enseignant connecté
+        $enseignant = $this->recupererenseignant();
 
-    // Récupérer les étudiants du module
-    // pour une année universitaire précise
-    $modules = DB::table('Inscription')
-        ->join('Etudiant', 'Inscription.IDETUD', '=', 'Etudiant.IDETUD')
-        ->join('Utilisateur', 'Etudiant.IDUSER', '=', 'Utilisateur.IDUSER')
-        ->join('Anneeuniv', 'Inscription.IDANNEE', '=', 'Anneeuniv.IDANNEE')
-        ->join('Filiere', 'Inscription.IDFILIERE', '=', 'Filiere.IDFILIERE')
-        ->join('Semestre', 'Filiere.IDFILIERE', '=', 'Semestre.IDFILIERE')
-        ->join('Module', 'Semestre.IDSEMESTRE', '=', 'Module.IDSEMESTRE')
+        // Récupérer les étudiants du module
+        // pour une année universitaire précise
+        $modules = DB::table('Inscription')
+            ->join('Etudiant', 'Inscription.IDETUD', '=', 'Etudiant.IDETUD')
+            ->join('Utilisateur', 'Etudiant.IDUSER', '=', 'Utilisateur.IDUSER')
+            ->join('Anneeuniv', 'Inscription.IDANNEE', '=', 'Anneeuniv.IDANNEE')
+            ->join('Filiere', 'Inscription.IDFILIERE', '=', 'Filiere.IDFILIERE')
+            ->join('Semestre', 'Filiere.IDFILIERE', '=', 'Semestre.IDFILIERE')
+            ->join('Module', 'Semestre.IDSEMESTRE', '=', 'Module.IDSEMESTRE')
 
-        ->join('Affectation', function ($join) {
-            $join->on('Affectation.IDMODULE', '=', 'Module.IDMODULE')
-                 ->on('Affectation.IDANNEE', '=', 'Inscription.IDANNEE');
-        })
-        ->select(
-            'Utilisateur.nom',
-            'Utilisateur.prenom',
-            'Etudiant.cne',
-            'Anneeuniv.libelle as annee'
-        )
-        ->where('Module.IDMODULE', $id)
-        ->where('Inscription.IDANNEE', $annee)
-        ->where('Affectation.IDENSG', $enseignant->IDENSG)
+            ->join('Affectation', function ($join) {
+                $join->on('Affectation.IDMODULE', '=', 'Module.IDMODULE')
+                    ->on('Affectation.IDANNEE', '=', 'Inscription.IDANNEE');
+            })
+            ->select(
+                'Utilisateur.nom',
+                'Utilisateur.prenom',
+                'Etudiant.cne',
+                'Anneeuniv.libelle as annee'
+            )
+            ->where('Module.IDMODULE', $id)
+            ->where('Inscription.IDANNEE', $annee)
+            ->where('Affectation.IDENSG', $enseignant->IDENSG)
 
-        ->orderBy('Utilisateur.nom')
-        ->distinct()
-        ->get();
+            ->orderBy('Utilisateur.nom')
+            ->distinct()
+            ->get();
 
-    return view('Enseignant.Modulesetudiants', compact('modules'));
-}
+        return view('Enseignant.Modulesetudiants', compact('modules'));
+    }
 
     public function recupererannee(){
         //récupirer l'annèe universitaire actuelle
@@ -462,8 +462,8 @@ public function mesetudiantsModule(int $id, int $annee){
             $examen,
             $enseignant,
             $annee,
-            $validated
-        ) {
+            $validated )
+        {
             foreach ($notes as $idEtud => $valeur) {
                 //vérifier que l'étudiant est inscrit et convoqué à cet examen
                 $etudiantAutorise = DB::table('Convocation as C')
@@ -477,8 +477,7 @@ public function mesetudiantsModule(int $id, int $annee){
                 if (!$etudiantAutorise) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
                     'notes' => "L'étudiant ID {$idEtud} n'est pas autorisé pour cet examen."
-                ]);
-}
+                ]); }
                 //chercher une note déjà enregistrée
                 $noteEtudiant = DB::table('NoteEtudiant')
                     ->where('IDETUD', $idEtud)
@@ -528,122 +527,122 @@ public function mesetudiantsModule(int $id, int $annee){
         ->orderByDesc('cne')
         ->get(); 
 
-    return view('Enseignant.moyennes', compact('annees', 'cne'));
+        return view('Enseignant.moyennes', compact('annees', 'cne'));
     }
 
     public function rechercherMoyennes(Request $request){
-    $request->validate([
-        'cne' => 'required|string',
-        'idAnnee' => 'required|integer|exists:Anneeuniv,IDANNEE',
-    ]);
+        $request->validate([
+            'cne' => 'required|string',
+            'idAnnee' => 'required|integer|exists:Anneeuniv,IDANNEE',
+        ]);
 
-    // Liste des années universitaires
-    $annees = DB::table('Anneeuniv')
-        ->orderByDesc('date_debut')
-        ->get();
-
-    // Recherche de l'étudiant par CNE
-    $etudiant = DB::table('Etudiant as ET')
-        ->join('Utilisateur as U', 'ET.IDUSER', '=', 'U.IDUSER')
-        ->where('ET.cne', $request->cne)
-        ->select(
-            'ET.IDETUD',
-            'ET.cne',
-            'U.nom',
-            'U.prenom'
-        )
-        ->first();
-    $resultats = [];
-    $moyennesSemestres = [];
-    $moyenneAnnuelle = null;
-    $inscriptions = collect();
-    $message = null;
-
-    if (!$etudiant) {
-        $message = 'Aucun étudiant trouvé avec ce CNE.';
-    } else {
-
-        // Filières auxquelles l'étudiant est inscrit durant l'année choisie
-        $inscriptions = DB::table('Inscription as I')
-            ->join('Filiere as F', 'I.IDFILIERE', '=', 'F.IDFILIERE')
-            ->where('I.IDETUD', $etudiant->IDETUD)
-            ->where('I.IDANNEE', $request->idAnnee)
-            ->select(
-                'F.IDFILIERE',
-                'F.nom',
-                'F.code'
-            )
+        // Liste des années universitaires
+        $annees = DB::table('Anneeuniv')
+            ->orderByDesc('date_debut')
             ->get();
-        if ($inscriptions->isEmpty()) {
-            $message = "Cet étudiant n'est pas inscrit pendant cette année universitaire.";
-        }
-        foreach ($inscriptions as $inscription) {
-            // Tous les semestres de la filière
-            $semestres = DB::table('Semestre')
-                ->where('IDFILIERE', $inscription->IDFILIERE)
-                ->orderBy('libelle')
+
+        // Recherche de l'étudiant par CNE
+        $etudiant = DB::table('Etudiant as ET')
+            ->join('Utilisateur as U', 'ET.IDUSER', '=', 'U.IDUSER')
+            ->where('ET.cne', $request->cne)
+            ->select(
+                'ET.IDETUD',
+                'ET.cne',
+                'U.nom',
+                'U.prenom'
+            )
+            ->first();
+        $resultats = [];
+        $moyennesSemestres = [];
+        $moyenneAnnuelle = null;
+        $inscriptions = collect();
+        $message = null;
+
+        if (!$etudiant) {
+            $message = 'Aucun étudiant trouvé avec ce CNE.';
+        } else {
+
+            // Filières auxquelles l'étudiant est inscrit durant l'année choisie
+            $inscriptions = DB::table('Inscription as I')
+                ->join('Filiere as F', 'I.IDFILIERE', '=', 'F.IDFILIERE')
+                ->where('I.IDETUD', $etudiant->IDETUD)
+                ->where('I.IDANNEE', $request->idAnnee)
+                ->select(
+                    'F.IDFILIERE',
+                    'F.nom',
+                    'F.code'
+                )
                 ->get();
-            $semestresResultats = [];
-            foreach ($semestres as $semestre) {
-                // Tous les modules du semestre, sans filtrer par enseignant
-                $modules = DB::table('Module as M')
-                    ->leftJoin('Examen as EX', 'M.IDEXAMEN', '=', 'EX.IDEXAMEN')
-                    ->leftJoin('Sessionexamen as SX', function ($join) use ($request, $semestre) {
-                        $join->on('EX.IDSX', '=', 'SX.IDSX')
-                            ->where('SX.IDSEMESTRE', '=', $semestre->IDSEMESTRE)
-                            ->where('SX.IDANNEE', '=', $request->idAnnee);
-                    })
-                    ->leftJoin('NoteEtudiant as NE', function ($join) use ($etudiant) {
-                        $join->on('NE.IDEXAMEN', '=', 'EX.IDEXAMEN')
-                            ->where('NE.IDETUD', '=', $etudiant->IDETUD)
-                            ->whereNotNull('SX.IDSX');
-                    })
-                    ->leftJoin('Note as N', 'NE.IDNOTE', '=', 'N.IDNOTE')
-                    ->where('M.IDSEMESTRE', $semestre->IDSEMESTRE)
-                    ->select(
-                        'M.IDMODULE',
-                        'M.code_mdl',
-                        'M.intitule',
-                        'N.valeur as note'
-                    )
-                    ->orderBy('M.code_mdl')
+            if ($inscriptions->isEmpty()) {
+                $message = "Cet étudiant n'est pas inscrit pendant cette année universitaire.";
+            }
+            foreach ($inscriptions as $inscription) {
+                // Tous les semestres de la filière
+                $semestres = DB::table('Semestre')
+                    ->where('IDFILIERE', $inscription->IDFILIERE)
+                    ->orderBy('libelle')
                     ->get();
-                // Les modules sans note ne sont pas inclus dans le calcul
-                $notesSaisies = $modules->whereNotNull('note');
+                $semestresResultats = [];
+                foreach ($semestres as $semestre) {
+                    // Tous les modules du semestre, sans filtrer par enseignant
+                    $modules = DB::table('Module as M')
+                        ->leftJoin('Examen as EX', 'M.IDEXAMEN', '=', 'EX.IDEXAMEN')
+                        ->leftJoin('Sessionexamen as SX', function ($join) use ($request, $semestre) {
+                            $join->on('EX.IDSX', '=', 'SX.IDSX')
+                                ->where('SX.IDSEMESTRE', '=', $semestre->IDSEMESTRE)
+                                ->where('SX.IDANNEE', '=', $request->idAnnee);
+                        })
+                        ->leftJoin('NoteEtudiant as NE', function ($join) use ($etudiant) {
+                            $join->on('NE.IDEXAMEN', '=', 'EX.IDEXAMEN')
+                                ->where('NE.IDETUD', '=', $etudiant->IDETUD)
+                                ->whereNotNull('SX.IDSX');
+                        })
+                        ->leftJoin('Note as N', 'NE.IDNOTE', '=', 'N.IDNOTE')
+                        ->where('M.IDSEMESTRE', $semestre->IDSEMESTRE)
+                        ->select(
+                            'M.IDMODULE',
+                            'M.code_mdl',
+                            'M.intitule',
+                            'N.valeur as note'
+                        )
+                        ->orderBy('M.code_mdl')
+                        ->get();
+                    // Les modules sans note ne sont pas inclus dans le calcul
+                    $notesSaisies = $modules->whereNotNull('note');
 
-                $moyenneSemestre = $notesSaisies->isNotEmpty()
-                    ? round($notesSaisies->avg('note'), 2)
-                    : null;
+                    $moyenneSemestre = $notesSaisies->isNotEmpty()
+                        ? round($notesSaisies->avg('note'), 2)
+                        : null;
 
-                if ($moyenneSemestre !== null) {
-                    $moyennesSemestres[] = $moyenneSemestre;
+                    if ($moyenneSemestre !== null) {
+                        $moyennesSemestres[] = $moyenneSemestre;
+                    }
+                    $semestresResultats[] = [
+                        'semestre' => $semestre,
+                        'modules' => $modules,
+                        'moyenne' => $moyenneSemestre,
+                    ];
                 }
-                $semestresResultats[] = [
-                    'semestre' => $semestre,
-                    'modules' => $modules,
-                    'moyenne' => $moyenneSemestre,
+                $resultats[] = [
+                    'filiere' => $inscription,
+                    'semestres' => $semestresResultats,
                 ];
             }
-            $resultats[] = [
-                'filiere' => $inscription,
-                'semestres' => $semestresResultats,
-            ];
+            // Moyenne générale = moyenne des moyennes des semestres disponibles
+            if (count($moyennesSemestres) > 0) {
+                $moyenneAnnuelle = round(
+                    array_sum($moyennesSemestres) / count($moyennesSemestres),
+                    2
+                );
+            }
         }
-        // Moyenne générale = moyenne des moyennes des semestres disponibles
-        if (count($moyennesSemestres) > 0) {
-            $moyenneAnnuelle = round(
-                array_sum($moyennesSemestres) / count($moyennesSemestres),
-                2
-            );
-        }
+        return view('Enseignant.moyennes', compact(
+            'annees',
+            'etudiant',
+            'inscriptions',
+            'resultats',
+            'moyenneAnnuelle',
+            'message'
+        ))->with('idAnnee', $request->idAnnee);
     }
-    return view('Enseignant.moyennes', compact(
-        'annees',
-        'etudiant',
-        'inscriptions',
-        'resultats',
-        'moyenneAnnuelle',
-        'message'
-    ))->with('idAnnee', $request->idAnnee);
-}
 }

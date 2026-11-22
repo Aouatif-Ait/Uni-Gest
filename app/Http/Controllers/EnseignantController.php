@@ -529,18 +529,16 @@ class EnseignantController extends Controller{
 
         return view('Enseignant.moyennes', compact('annees', 'cne'));
     }
-
+ 
     public function rechercherMoyennes(Request $request){
         $request->validate([
             'cne' => 'required|string',
             'idAnnee' => 'required|integer|exists:Anneeuniv,IDANNEE',
         ]);
-
         // Liste des années universitaires
         $annees = DB::table('Anneeuniv')
             ->orderByDesc('date_debut')
             ->get();
-
         // Recherche de l'étudiant par CNE
         $etudiant = DB::table('Etudiant as ET')
             ->join('Utilisateur as U', 'ET.IDUSER', '=', 'U.IDUSER')
@@ -553,87 +551,180 @@ class EnseignantController extends Controller{
             )
             ->first();
         $resultats = [];
-        $moyennesSemestres = [];
-        $moyenneAnnuelle = null;
         $inscriptions = collect();
         $message = null;
-
         if (!$etudiant) {
             $message = 'Aucun étudiant trouvé avec ce CNE.';
         } else {
-
-            // Filières auxquelles l'étudiant est inscrit durant l'année choisie
+            // Filières de l'étudiant durant l'année choisie
             $inscriptions = DB::table('Inscription as I')
                 ->join('Filiere as F', 'I.IDFILIERE', '=', 'F.IDFILIERE')
+                ->join('Cycle as C', 'F.IDCYCLE', '=', 'C.IDCYCLE')
                 ->where('I.IDETUD', $etudiant->IDETUD)
                 ->where('I.IDANNEE', $request->idAnnee)
                 ->select(
                     'F.IDFILIERE',
                     'F.nom',
-                    'F.code'
+                    'F.code',
+                    'F.IDCYCLE',
+                    'C.libelle as cycle',
+                    'C.duree'
                 )
                 ->get();
             if ($inscriptions->isEmpty()) {
                 $message = "Cet étudiant n'est pas inscrit pendant cette année universitaire.";
             }
+
+            //Fonction pour récupérer les modules et leurs notes d'un semestre durant une année universitaire donnée.
+            $chargerModules = function ($idSemestre, $idAnnee) use ($etudiant) {
+                return DB::table('Module as M')
+                    ->leftJoin('Examen as EX', 'M.IDEXAMEN', '=', 'EX.IDEXAMEN')
+                    ->leftJoin('Sessionexamen as SX', function ($join) use ($idSemestre, $idAnnee) {
+                        $join->on('EX.IDSX', '=', 'SX.IDSX')
+                            ->where('SX.IDSEMESTRE', '=', $idSemestre)
+                            ->where('SX.IDANNEE', '=', $idAnnee);
+                    })
+                    ->leftJoin('NoteEtudiant as NE', function ($join) use ($etudiant) {
+                        $join->on('NE.IDEXAMEN', '=', 'EX.IDEXAMEN')
+                            ->where('NE.IDETUD', '=', $etudiant->IDETUD)
+                            ->whereNotNull('SX.IDSX');
+                    })
+                    ->leftJoin('Note as N', 'NE.IDNOTE', '=', 'N.IDNOTE')
+                    ->where('M.IDSEMESTRE', $idSemestre)
+                    ->select(
+                        'M.IDMODULE',
+                        'M.code_mdl',
+                        'M.intitule',
+                        'N.valeur as note'
+                    )
+                    ->orderBy('M.code_mdl')
+                    ->get();
+            };
             foreach ($inscriptions as $inscription) {
+
                 // Tous les semestres de la filière
                 $semestres = DB::table('Semestre')
                     ->where('IDFILIERE', $inscription->IDFILIERE)
                     ->orderBy('libelle')
                     ->get();
                 $semestresResultats = [];
+
+                // Initialisation des moyennes par année d'étude
+                $moyennesParAnnee = [];
+
+                for ($i = 1; $i <= $inscription->duree; $i++) {
+                    $moyennesParAnnee[$i] = [];
+                }
                 foreach ($semestres as $semestre) {
-                    // Tous les modules du semestre, sans filtrer par enseignant
-                    $modules = DB::table('Module as M')
-                        ->leftJoin('Examen as EX', 'M.IDEXAMEN', '=', 'EX.IDEXAMEN')
-                        ->leftJoin('Sessionexamen as SX', function ($join) use ($request, $semestre) {
-                            $join->on('EX.IDSX', '=', 'SX.IDSX')
-                                ->where('SX.IDSEMESTRE', '=', $semestre->IDSEMESTRE)
-                                ->where('SX.IDANNEE', '=', $request->idAnnee);
-                        })
-                        ->leftJoin('NoteEtudiant as NE', function ($join) use ($etudiant) {
-                            $join->on('NE.IDEXAMEN', '=', 'EX.IDEXAMEN')
-                                ->where('NE.IDETUD', '=', $etudiant->IDETUD)
-                                ->whereNotNull('SX.IDSX');
-                        })
-                        ->leftJoin('Note as N', 'NE.IDNOTE', '=', 'N.IDNOTE')
-                        ->where('M.IDSEMESTRE', $semestre->IDSEMESTRE)
-                        ->select(
-                            'M.IDMODULE',
-                            'M.code_mdl',
-                            'M.intitule',
-                            'N.valeur as note'
-                        )
-                        ->orderBy('M.code_mdl')
-                        ->get();
-                    // Les modules sans note ne sont pas inclus dans le calcul
-                    $notesSaisies = $modules->whereNotNull('note');
 
-                    $moyenneSemestre = $notesSaisies->isNotEmpty()
-                        ? round($notesSaisies->avg('note'), 2)
+                    // Modules du semestre durant l'année universitaire choisie
+                    $modules = $chargerModules(
+                        $semestre->IDSEMESTRE,
+                        $request->idAnnee
+                    );
+                    // Vérifier si toutes les notes sont saisies
+                    $toutesNotesSaisies = $modules->isNotEmpty()
+                        && $modules->every(fn($module) => $module->note !== null);
+                    // Moyenne du semestre
+                    $moyenneSemestre = $toutesNotesSaisies
+                        ? round($modules->avg('note'), 2)
                         : null;
-
-                    if ($moyenneSemestre !== null) {
-                        $moyennesSemestres[] = $moyenneSemestre;
+                    // Identifier l'année d'étude à partir du semestre
+                    if (preg_match('/^S([0-9]+)$/i', trim($semestre->libelle), $matches)) {
+                        $numeroSemestre = (int) $matches[1];
+                        $numeroAnnee = (int) ceil($numeroSemestre / 2);
+                        if (isset($moyennesParAnnee[$numeroAnnee])) {
+                            $moyennesParAnnee[$numeroAnnee][] = $moyenneSemestre;
+                        }
                     }
                     $semestresResultats[] = [
                         'semestre' => $semestre,
                         'modules' => $modules,
                         'moyenne' => $moyenneSemestre,
+                        'complet' => $toutesNotesSaisies,
                     ];
                 }
+                //Moyennes annuelles pour l'année universitaire sélectionnée On conserve le calcul : moyenne des deux semestres.
+                $moyennesAnnees = [];
+                foreach ($moyennesParAnnee as $numeroAnnee => $moyennes) {
+                    $moyenneAnnee = count($moyennes) === 2
+                        && !in_array(null, $moyennes, true)
+                        ? round(array_sum($moyennes) / 2, 2)
+                        : null;
+                    $moyennesAnnees[$numeroAnnee] = $moyenneAnnee;
+                }
+
+                // Calcul de la moyenne générale du cursus
+                // Récupérer toutes les inscriptions de l'étudiant
+                // dans cette filière, classées chronologiquement.
+                $inscriptionsCursus = DB::table('Inscription as I')
+                    ->join('Anneeuniv as A', 'I.IDANNEE', '=', 'A.IDANNEE')
+                    ->where('I.IDETUD', $etudiant->IDETUD)
+                    ->where('I.IDFILIERE', $inscription->IDFILIERE)
+                    ->orderBy('A.date_debut')
+                    ->get();
+
+                // Moyennes annuelles de tout le cursus
+                $moyennesAnneesCursus = [];
+
+                // Parcourir les années selon la durée du cycle
+                for ($anneeEtude = 1; $anneeEtude <= $inscription->duree; $anneeEtude++) {
+                    $inscriptionCursus = $inscriptionsCursus->get($anneeEtude - 1);
+                    $moyennesDeuxSemestres = [];
+                    // Chaque année d'étude contient deux semestres
+                    for (
+                        $numeroSemestre = (2 * $anneeEtude) - 1;
+                        $numeroSemestre <= (2 * $anneeEtude);
+                        $numeroSemestre++
+                    ) {
+
+                        $libelleRecherche = 'S' . $numeroSemestre;
+                        $semestreCursus = $semestres->first(
+                            fn($s) => strtoupper(trim($s->libelle)) === $libelleRecherche
+                        );
+
+                        // Vérifier l'existence de l'inscription et du semestre
+                        if (!$inscriptionCursus || !$semestreCursus) {
+                            $moyennesDeuxSemestres[] = null;
+                            continue;
+                        }
+                        // Récupérer les modules et notes de ce semestre
+                        // pendant l'année universitaire correspondante.
+                        $modulesCursus = $chargerModules(
+                            $semestreCursus->IDSEMESTRE,
+                            $inscriptionCursus->IDANNEE
+                        );
+
+                        $notesCompletes = $modulesCursus->isNotEmpty()
+                            && $modulesCursus->every(fn($module) => $module->note !== null);
+                        $moyenneSemestreCursus = $notesCompletes
+                            ? round($modulesCursus->avg('note'), 2)
+                            : null;
+                        $moyennesDeuxSemestres[] = $moyenneSemestreCursus;
+                    }
+
+                    // Calculer la moyenne annuelle uniquement
+                    // si les deux semestres sont complets.
+                    $moyenneAnneeCursus = count($moyennesDeuxSemestres) === 2
+                        && !in_array(null, $moyennesDeuxSemestres, true)
+                        ? round(array_sum($moyennesDeuxSemestres) / 2, 2)
+                        : null;
+                    $moyennesAnneesCursus[$anneeEtude] = $moyenneAnneeCursus;
+                }
+                // Moyenne générale du cursus
+                // uniquement si toutes les années sont complètes.
+                $moyenneGenerale = count($moyennesAnneesCursus) === $inscription->duree
+                    && !in_array(null, $moyennesAnneesCursus, true)
+                    ? round(array_sum($moyennesAnneesCursus) / $inscription->duree, 2)
+                    : null;
+
                 $resultats[] = [
                     'filiere' => $inscription,
                     'semestres' => $semestresResultats,
+                    'moyennesAnnees' => $moyennesAnnees,
+                    'moyennesAnneesCursus' => $moyennesAnneesCursus,
+                    'moyenneGenerale' => $moyenneGenerale,
                 ];
-            }
-            // Moyenne générale = moyenne des moyennes des semestres disponibles
-            if (count($moyennesSemestres) > 0) {
-                $moyenneAnnuelle = round(
-                    array_sum($moyennesSemestres) / count($moyennesSemestres),
-                    2
-                );
             }
         }
         return view('Enseignant.moyennes', compact(
@@ -641,7 +732,6 @@ class EnseignantController extends Controller{
             'etudiant',
             'inscriptions',
             'resultats',
-            'moyenneAnnuelle',
             'message'
         ))->with('idAnnee', $request->idAnnee);
     }
